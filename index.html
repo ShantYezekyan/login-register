@@ -37,9 +37,20 @@
         </div>
 
         <div class="user">
+            <p id="user_greet"></p>
             <button id="logOutBtn">Log Out</button>
             <button id="deleteUserBtn">Delete Account</button>
-            <p id="user_greet"></p>
+            <div>
+                <form action="" id="editUser">
+                    <p>Fill in the data that you would like to change</p>
+                    <input type="text" name="email" placeholder="email">
+                    <input type="password" name="password" placeholder="password">
+                    <input type="text" name="name" placeholder="name">
+                    <input type="number" name="age" placeholder="age">
+                    <button id="editUserBtn">Edit User Data</button>
+                </form>
+            </div>
+            
         </div>
 
         <div id="error_container">

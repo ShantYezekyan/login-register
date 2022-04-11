@@ -12,6 +12,7 @@ const loginData = {
 
 let userData = {};
 
+const userEditedData = {};
 
 document.getElementById('registration').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -69,7 +70,7 @@ document.getElementById('login').addEventListener('submit', (e) => {
     })
 })
 
-const logOutSucess = () => {
+const logOutSuccess = () => {
     document.querySelector('.user').style.display = 'none';
     document.querySelector('.login_container').style.display = 'block';
     userData = {};
@@ -94,7 +95,7 @@ document.getElementById('logOutBtn').addEventListener('click', (e) => {
 
     .then(res => {
         if (res.ok) {
-            logOutSucess()
+            logOutSuccess()
         } else {
             res.json().then(jsonRes => {
                 document.getElementById('error_container').innerText = jsonRes.error;
@@ -113,7 +114,7 @@ document.getElementById('deleteUserBtn').addEventListener('click', (e) => {
 
     .then(res => {
         if (res.ok) {
-            logOutSucess()
+            logOutSuccess()
         } else {
             res.json().then(jsonRes => {
                 document.getElementById('error_container').innerText = jsonRes.error;
@@ -145,3 +146,35 @@ document.getElementById('register_redirect').addEventListener('click', (e) => {
     document.querySelector('.login_container').style.display = 'none';
     document.querySelector('.register_container').style.display = 'block';
 })
+
+document.getElementById('editUser').addEventListener('change', (e) => {
+    const { name, value } = e.target;
+    if (value) {
+        userEditedData[name] = value;
+    } else if (value === '') {
+        delete userEditedData[name];
+    }
+});
+
+document.getElementById('editUserBtn').addEventListener('click', (e) => {
+    e.preventDefault()
+    fetch("https://api-nodejs-todolist.herokuapp.com/user/me", {
+        method: 'PUT',
+        headers: {
+            "Content-Type": "application/json",
+            'Authorization' : `Bearer ${userData.myToken}`
+        },
+        body: JSON.stringify(userEditedData)
+    })
+    .then(res => {
+        if (res.ok) {
+            logOutSuccess()
+        } else {
+            res.json().then(jsonRes => {
+                document.getElementById('error_container').style.display = 'block'
+                document.getElementById('error_container').innerText = jsonRes;
+            })
+        }
+    })
+})
+
