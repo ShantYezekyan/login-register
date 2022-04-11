@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./CSS/style.css">
+    <title>Login/Register Test</title>
+</head>
+<body>
+
+    <main>
+        <div class="register_container">
+            <h2>Register</h2>
+            <form action="" id="registration" class="registerForm">
+                <input type="text" id="name" name="name" placeholder="Name">
+                <input type="email" name="email" placeholder="email">
+                <input type="number" name="age" placeholder="Age">
+                <input type="password" name="password" placeholder="Password">
+                <button class="registerBtn">Register</button>
+            </form>
+
+            <p>Already a user?</p>
+            <a href="" id="signIn_redirect">Click here to Sign In</a>
+        </div>
+
+        <div class="login_container">
+            <h2>Log In</h2>
+            <form action="" id="login">
+                <input type="email" name="email" placeholder="email">
+                <input type="password" name="password" placeholder="Password">
+                <button class="loginBtn">Log In</button>
+            </form>
+            
+            <p>Don't have an Account?</p>
+            <a href="" id="register_redirect">Click here to Register</a>
+        </div>
+
+        <div class="user">
+            <button id="logOutBtn">Log Out</button>
+            <button id="deleteUserBtn">Delete Account</button>
+            <p id="user_greet"></p>
+        </div>
+
+        <div id="error_container">
+            
+        </div>
+
+    </main>
+
+
+    <script src="./index.js"></script>
+</body>
+
+</html>

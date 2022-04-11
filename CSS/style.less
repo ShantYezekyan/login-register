@@ -1,0 +1,57 @@
+main {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.register_container, .login_container {
+    // height: 100vh;
+    // display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: antiquewhite;
+    padding: 20px;
+
+    input {
+        display: block;
+        margin: 5px;
+        border: 1px solid black;
+        border-radius: 15px;
+        text-indent: 10px;
+        font-size: 20px;
+    }
+
+    button {
+        margin: 5px;
+        border-radius: 15px;
+        font-size: 20px;
+        background-color: white;
+        border: 1px solid black;
+        &:hover {
+            background-color: aqua;
+            color: rgba(0, 0, 0, 0.475);
+        }
+    }
+}
+
+.register_container {
+    display: none;
+}
+
+#error_container {
+    display: none;
+    padding: 2px;
+    background-color: aquamarine;
+}
+
+
+.user {
+    display: none;
+    > p {
+        font-size: 30px;
+    }
+}
