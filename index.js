@@ -22,6 +22,22 @@ document.getElementById('registration').addEventListener('submit', (e) => {
         },
         body: JSON.stringify(registerData)
     })
+
+    .then(res => {
+        if (res.ok) {
+            document.getElementById('error_container').style.display = 'block';
+            document.getElementById('error_container').innerText = 'You Successfully Registered'
+            setTimeout(() => {
+                document.querySelector('.register_container').style.display = 'none';
+                document.querySelector('.login_container').style.display = 'block';
+            }, 3000)
+        } else {
+            res.json().then(jsonRes => {
+                document.getElementById('error_container').style.display = 'block';
+                document.getElementById('error_container').innerText = jsonRes;
+            })
+        }
+    })
         
 })
 
