@@ -1,127 +1,114 @@
-const registerData = {
-    name: '',
-    email: '',
-    age: '',
-    password: ''
-};
+import Fetch from './fetch.js';
+import Cookie from './cookie.js';
 
-const loginData = {
-    email: '',
-    password: ''
+const userFetch = new Fetch('https://api-nodejs-todolist.herokuapp.com/user');
+const taskFetch = new Fetch('https://api-nodejs-todolist.herokuapp.com');
+const token = new Cookie;
+
+const registerData = {}
+const loginData = {}
+const userEditedData = {};
+let userData = {};
+let tasks = [];
+
+
+const errorBlock = document.getElementById('error_container');
+const registerPage = document.querySelector('.register_container')
+const loginPage = document.querySelector('.login_container')
+
+
+// -------- Display Pages ------------------------
+const loginSuccess = () => {
+    errorBlock.innerText = '';
+    errorBlock.style.display = 'none';
+    loginPage.style.display = 'none';
+    document.querySelector('.user').style.display = 'block';
+    document.querySelector('#user_greet').innerText = `Hello ${userData.name}`
+    renderTasks()
 }
 
-let userData = {};
+const logOutSuccess = () => {
+    document.querySelector('.user').style.display = 'none';
+    loginPage.style.display = 'block';
+    userData = {};
+    document
+}
 
-const userEditedData = {};
 
+// -------- Fetch fucntions ------------------------
 document.getElementById('registration').addEventListener('submit', (e) => {
     e.preventDefault();
-    fetch("https://api-nodejs-todolist.herokuapp.com/user/register", {
-        method: 'POST',
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(registerData)
-    })
-
+    userFetch.request('register', 'POST', { "Content-Type": "application/json" }, registerData)
     .then(res => {
         if (res.ok) {
-            document.getElementById('error_container').style.display = 'block';
-            document.getElementById('error_container').innerText = 'You Successfully Registered'
+            errorBlock.style.display = 'block';
+            errorBlock.innerText = 'You Successfully Registered'
             setTimeout(() => {
-                document.querySelector('.register_container').style.display = 'none';
-                document.querySelector('.login_container').style.display = 'block';
+                registerPage.style.display = 'none';
+                loginPage.style.display = 'block';
             }, 3000)
         } else {
             res.json().then(jsonRes => {
-                document.getElementById('error_container').style.display = 'block';
-                document.getElementById('error_container').innerText = jsonRes;
+                errorBlock.style.display = 'block';
+                errorBlock.innerText = jsonRes;
             })
         }
     })
-        
+
 })
 
 document.getElementById('login').addEventListener('submit', (e) => {
     e.preventDefault();
-    fetch("https://api-nodejs-todolist.herokuapp.com/user/login", {
-        method: 'POST',
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(loginData)
-    })
-        
+    userFetch.request('login', 'POST', { "Content-Type": "application/json" }, loginData)
     .then(res => {
         if (res.ok) {
-            document.getElementById('error_container').style.display = 'block';
-            document.getElementById('error_container').innerText = 'Success!'
+            errorBlock.style.display = 'block';
+            errorBlock.innerText = 'Success!'
             res.json().then(jsonRes => {
                 userData = jsonRes.user
-                userData.myToken = jsonRes.token;
-                loginSuccess() 
+                token.setCookie('accessToken', jsonRes.token)
+                console.log(userData);
+                loginSuccess()
             })
         } else {
             res.json().then(jsonRes => {
-                document.getElementById('error_container').style.display = 'block';
-                document.getElementById('error_container').innerText = jsonRes;
+                errorBlock.style.display = 'block';
+                errorBlock.innerText = jsonRes;
             })
         }
     })
 })
 
-const logOutSuccess = () => {
-    document.querySelector('.user').style.display = 'none';
-    document.querySelector('.login_container').style.display = 'block';
-    userData = {};
-}
 
-
-const loginSuccess = () => {
-    document.getElementById('error_container').innerText = '';
-    document.getElementById('error_container').style.display = 'none';
-    document.querySelector('.login_container').style.display = 'none';
-    document.querySelector('.user').style.display = 'block';
-    document.querySelector('#user_greet').innerText = `Hello ${userData.name}`
-}
 
 document.getElementById('logOutBtn').addEventListener('click', (e) => {
-    fetch("https://api-nodejs-todolist.herokuapp.com/user/logout", {
-        method: 'POST',
-        headers: {
-            'Authorization' : `Bearer ${userData.myToken}`
-        }
-    })
-
+    userFetch.request('logout', 'POST', { 'Authorization': `Bearer ${token.getCookie('accessToken')}` })
     .then(res => {
         if (res.ok) {
             logOutSuccess()
         } else {
             res.json().then(jsonRes => {
-                document.getElementById('error_container').innerText = jsonRes.error;
+                errorBlock.innerText = jsonRes.error;
             })
         }
     })
 })
 
 document.getElementById('deleteUserBtn').addEventListener('click', (e) => {
-    fetch("https://api-nodejs-todolist.herokuapp.com/user/me", {
-        method: 'DELETE',
-        headers: {
-            'Authorization' : `Bearer ${userData.myToken}`
-        }
-    })
-
+    userFetch.request('me', 'DELETE', { 'Authorization': `Bearer ${token.getCookie('accessToken')}` })
     .then(res => {
         if (res.ok) {
             logOutSuccess()
         } else {
             res.json().then(jsonRes => {
-                document.getElementById('error_container').innerText = jsonRes.error;
+                errorBlock.innerText = jsonRes.error;
             })
         }
     })
 })
+
+
+
 
 document.getElementById('registration').addEventListener('change', (e) => {
     const { name, value } = e.target;
@@ -137,17 +124,17 @@ document.getElementById('login').addEventListener('change', (e) => {
 
 document.getElementById('signIn_redirect').addEventListener('click', (e) => {
     e.preventDefault()
-    document.querySelector('.register_container').style.display = 'none';
-    document.querySelector('.login_container').style.display = 'block';
+    registerPage.style.display = 'none';
+    loginPage.style.display = 'block';
 })
 
 document.getElementById('register_redirect').addEventListener('click', (e) => {
     e.preventDefault()
-    document.querySelector('.login_container').style.display = 'none';
-    document.querySelector('.register_container').style.display = 'block';
+    loginPage.style.display = 'none';
+    registerPage.style.display = 'block';
 })
 
-document.getElementById('editUser').addEventListener('change', (e) => {
+document.getElementById('editProfileForm').addEventListener('change', (e) => {
     const { name, value } = e.target;
     if (value) {
         userEditedData[name] = value;
@@ -158,23 +145,142 @@ document.getElementById('editUser').addEventListener('change', (e) => {
 
 document.getElementById('editUserBtn').addEventListener('click', (e) => {
     e.preventDefault()
-    fetch("https://api-nodejs-todolist.herokuapp.com/user/me", {
-        method: 'PUT',
-        headers: {
-            "Content-Type": "application/json",
-            'Authorization' : `Bearer ${userData.myToken}`
-        },
-        body: JSON.stringify(userEditedData)
-    })
-    .then(res => {
-        if (res.ok) {
-            logOutSuccess()
-        } else {
-            res.json().then(jsonRes => {
-                document.getElementById('error_container').style.display = 'block'
-                document.getElementById('error_container').innerText = jsonRes;
-            })
-        }
-    })
+    userFetch.request('me', 'PUT', {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token.getCookie('accessToken')}`
+    }, userEditedData)
+        .then(res => {
+            if (res.ok) {
+                logOutSuccess()
+            } else {
+                res.json().then(jsonRes => {
+                    errorBlock.style.display = 'block'
+                    errorBlock.innerText = jsonRes;
+                })
+            }
+        })
 })
 
+
+
+
+// const intro = () => {
+//     userFetch.get('me', {'Authorization': `Bearer ${token.getCookie('accessToken')}`})
+//     loginSuccess()
+// }
+// intro()
+
+const toggleProfileEdit = () => {
+    const form = document.getElementById('editProfileForm')
+   
+    if (form.style.display === 'none') {
+        form.style.display = 'block';
+    } else if (form.style.display === 'block') {
+        form.style.display = 'none';
+    }
+}
+
+document.getElementById('profileEditorBtn').addEventListener('click', toggleProfileEdit)
+
+
+
+// --------------------- Task Section -------------------------------
+
+
+
+document.getElementById('addTaskBtn').addEventListener('click', () => {
+    const data = {}
+    data.description = document.getElementById('newTask').value
+    taskFetch.request('task', 'POST', {"Content-Type": "application/json", 'Authorization': `Bearer ${token.getCookie('accessToken')}`}, data)
+})
+
+// taskFetch.request('task', 'POST', {"Content-Type": "application/json", 'Authorization': `Bearer ${token.getCookie('accessToken')}`}, 'description: Task 1')
+
+const thCreator = (content, elToAppend) => {
+    const th = document.createElement('th')
+    th.innerText = content;
+    elToAppend.appendChild(th)
+}
+
+const tdCreator = (arrData, order, elToAppend) => {
+    const row = document.createElement('tr')
+    const td1 = document.createElement('td')
+    const td2 = document.createElement('td')
+    const td3 = document.createElement('td')
+    const td4 = document.createElement('td')
+
+    td1.innerText = order
+    row.appendChild(td1)
+
+    td2.innerText = arrData.description
+    row.appendChild(td2)
+
+    if (arrData.completed) {
+        td3.innerText = 'Done'
+        row.appendChild(td3)
+    } else {
+        const doneBtn = document.createElement('button')
+        doneBtn.setAttribute('id', arrData._id)
+        doneBtn.innerText = 'Click to Complete'
+        td3.appendChild(doneBtn)
+        row.appendChild(td3)
+    }
+
+    const delBtn = document.createElement('button')
+    delBtn.setAttribute('id', arrData._id)
+    delBtn.innerText = 'Delete'
+    td4.appendChild(delBtn)
+    row.appendChild(td4)
+
+
+    elToAppend.appendChild(row)
+}
+
+const tableCreator = () => {
+    const container = document.querySelector('.task_container')
+    const table = document.createElement('table')
+    const thead = document.createElement('thead')
+    table.appendChild(thead)
+    const htr = document.createElement('tr')
+    thCreator('Order', htr)
+    thCreator('Task Name', htr)
+    thCreator('Status', htr)
+    thCreator('Action', htr)
+    thead.appendChild(htr)
+    container.appendChild(table)
+
+    const tbody = document.createElement('tbody')
+    table.appendChild(tbody)
+    
+    if (tasks.length !== 0) {
+        tasks.forEach((el, index) => {
+            tdCreator(el, index+1, tbody)
+        });
+    } 
+
+    console.log(tasks); 
+}
+
+
+
+
+
+const renderTasks = () => {
+    taskFetch.get('task', {"Content-Type": "application/json", 'Authorization': `Bearer ${token.getCookie('accessToken')}`})
+    .then(res => {
+        if (res.ok) {
+            res.json().then(jsonRes => {
+                // tasks.push(jsonRes.data)
+                tasks = jsonRes.data
+                tableCreator()
+            })
+        } else {
+            res.json().then(jsonRes => {
+                errorBlock.style.display = 'block' //Needs to be Checked
+                errorBlock.innerText = jsonRes;
+            })
+        }
+    })   
+}
+
+document.getElementById('testBtn').addEventListener('click', renderTasks)
